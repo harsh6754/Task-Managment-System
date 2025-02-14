@@ -9,3 +9,5 @@ C:\Users\agarw\OneDrive\Desktop\Harsh Project\Tasks_Managment_System\Repositorie
 C:\Users\agarw\OneDrive\Desktop\Harsh Project\Tasks_Managment_System\Repositories\obj\Debug\net8.0\refint\Repositories.dll
 C:\Users\agarw\OneDrive\Desktop\Harsh Project\Tasks_Managment_System\Repositories\obj\Debug\net8.0\Repositories.pdb
 C:\Users\agarw\OneDrive\Desktop\Harsh Project\Tasks_Managment_System\Repositories\obj\Debug\net8.0\ref\Repositories.dll
+C:\Users\agarw\OneDrive\Desktop\Harsh Project\Tasks_Managment_System\Repositories\obj\Debug\net8.0\Repositories.sourcelink.json
+C:\Users\agarw\OneDrive\Desktop\Harsh Project\Tasks_Managment_System\Repositories\obj\Debug\net8.0\Repositories.csproj.AssemblyReference.cache
