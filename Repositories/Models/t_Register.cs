@@ -81,9 +81,11 @@ namespace Repositories.Models
 
         [StringLength(4000)]
         [Display(Name = "Profile Picture")]
-        public string? c_image { get; set; }
+        public string? c_imagePath { get; set; }
 
-        public IFormFile? ProfilePic { get; set; }
+        [NotMapped]
+        [Display(Name = "Profile Picture")]
+        public IFormFile? c_image { get; set; }
 
 
         [Required]

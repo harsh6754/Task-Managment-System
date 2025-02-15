@@ -1,4 +1,10 @@
 using Npgsql;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Repositories.Interfaces;
+using Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<NpgsqlConnection>((serviceProvide) =>{
-    var connectionString = serviceProvide.GetRequiredService<IConfiguration>().GetConnectionString("Pgconn");
-    return new NpgsqlConnection(connectionString);
+builder.Services.AddSingleton<IRegisterLoginInterface, RegisterLoginRepository>();
+builder.Services.AddSingleton<NpgsqlConnection>((RegisterLoginRepository) =>{
+    var connectionStrings = RegisterLoginRepository.GetRequiredService<IConfiguration>().GetConnectionString("Pgconn");
+    return new NpgsqlConnection(connectionStrings);
 });
 
 
