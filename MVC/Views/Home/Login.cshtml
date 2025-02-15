@@ -1,0 +1,117 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100" style="background-color: #9A616D ; border: 2px solid black; border-radius: 40px;">
+    <div class="card p-5 shadow-lg rounded-10" style="width:100%; max-width:80% ; height:80vh; background: white; border-radius: 20px;">
+        <div class="text-center mb-4">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User Icon" width="80">
+            <h3 class="mt-3">Welcome Back</h3>
+            <p class="text-muted">Login to your account</p>
+        </div>
+        <form method="post" enctype="multipart/form-data" id="loginForm">
+            <div class="form-floating mb-3">
+                <input type="email" id="email" class="form-control rounded-3" placeholder="Enter email">
+                <label for="email">Email</label>
+                <small class="text-danger" id="emailError"></small>
+            </div>
+            
+            <div class="form-floating mb-3">
+                <input type="password" id="pwd" class="form-control rounded-3" placeholder="Enter password">
+                <label for="pwd">Password</label>
+                <small class="text-danger" id="passwordError"></small>
+            </div>
+            
+            <button type="submit" id="login" class="btn btn-primary w-100 rounded-pill">Login</button>
+            <span id="responseMessage" class="d-block mt-3 text-center"></span>
+        </form>
+        <div class="text-center mt-3">
+            <p class="text-muted">Don't have an account? <a href="/Home/Register" class="text-primary">Sign up</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#loginForm').submit(function (event) {
+                event.preventDefault();
+
+                // Clear previous error messages
+                $("#emailError").text("");
+                $("#passwordError").text("");
+
+                // Get input values
+                var email = $('#email').val().trim();
+                var password = $('#pwd').val().trim();
+                var hasError = false;
+
+                // Inline validation
+                if (!email) {
+                    $("#emailError").text("Email is required.");
+                    hasError = true;
+                }
+                if (!password) {
+                    $("#passwordError").text("Password is required.");
+                    hasError = true;
+                }
+
+                if (hasError) return; // Stop execution if validation fails
+
+                // Disable login button to prevent multiple requests
+                $("#login").prop("disabled", true).text("Logging in...");
+
+                var formData = new FormData();
+                formData.append("c_Email", email);
+                formData.append("c_Password", password);
+
+                $.ajax({
+                    url: 'http://localhost:5277/api/RegisterLogin/Login',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        $("#login").prop("disabled", false).text("Submit");
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Login Successful',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                sessionStorage.setItem("user", JSON.stringify(response.userData));
+                                @* window.location.href = "/Home/Dashboard"; // Redirect after login *@
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $("#login").prop("disabled", false).text("Submit");
+
+                        var displayError = "";
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            displayError += xhr.responseJSON.errors.c_Email ? xhr.responseJSON.errors.c_Email + "\n" : "";
+                            displayError += xhr.responseJSON.errors.c_Password ? xhr.responseJSON.errors.c_Password + "\n" : "";
+                        } else {
+                            displayError = "An error occurred. Please try again.";
+                        }
+
+                        Swal.fire({
+                            title: 'Error',
+                            text: displayError,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}
