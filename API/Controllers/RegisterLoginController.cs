@@ -33,7 +33,7 @@ public async Task<IActionResult> Register([FromForm] t_Register register)
         if (register.ProfilePic?.Length > 0)
         {
             var fileName = $"{register.c_email}{Path.GetExtension(register.ProfilePic.FileName)}";
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "profile_images");
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(),"../MVC/wwwroot/profile_images");
             var filePath = Path.Combine(uploadsFolder, fileName);
             
             // Ensure directory exists
