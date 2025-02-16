@@ -47,8 +47,8 @@ namespace Repositories.Implementations
                             UserData.c_mobile = reader["c_mobile"].ToString();
                             UserData.c_country = reader["c_country"].ToString();
                             UserData.c_state = reader["c_state"].ToString();
-                            UserData.c_district = reader["c_district"].ToString();  
-                            
+                            UserData.c_district = reader["c_district"].ToString();
+
                         }
                     }
                 }
@@ -90,21 +90,10 @@ namespace Repositories.Implementations
                     }
                 }
 
-                // Convert IFormFile to byte array for storage in `bytea`
-                byte[] imageBytes = null;
-                if (register.c_image != null)
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await register.c_image.CopyToAsync(memoryStream);
-                        imageBytes = memoryStream.ToArray();
-                    }
-                }
-
                 // Insert user data
                 using (NpgsqlCommand cm = new NpgsqlCommand(
-                    "INSERT INTO t_user (c_username, c_email, c_password,c_confirmPassword ,c_address, c_mobile, c_gender, c_dob, c_country, c_state, c_district, c_imagePath) " +
-                    "VALUES(@c_username, @c_email, @c_password,@c_confirmPassword, @c_address, @c_mobile, @c_gender, @c_dob, @c_country, @c_state, @c_district, @c_imagePath)", _conn))
+                    "INSERT INTO t_user (c_username, c_email, c_password, c_confirmPassword, c_address, c_mobile, c_gender, c_dob, c_country, c_state, c_district, c_image) " +
+                    "VALUES(@c_username, @c_email, @c_password, @c_confirmPassword, @c_address, @c_mobile, @c_gender, @c_dob, @c_country, @c_state, @c_district, @c_image)", _conn))
                 {
                     cm.Parameters.AddWithValue("@c_username", register.c_username);
                     cm.Parameters.AddWithValue("@c_email", register.c_email);
@@ -117,7 +106,8 @@ namespace Repositories.Implementations
                     cm.Parameters.AddWithValue("@c_country", register.c_country);
                     cm.Parameters.AddWithValue("@c_state", register.c_state);
                     cm.Parameters.AddWithValue("@c_district", register.c_district);
-                    cm.Parameters.AddWithValue("@c_imagePath", imageBytes ?? (object)DBNull.Value);
+                    cm.Parameters.AddWithValue("@c_image", !String.IsNullOrEmpty(register.c_image) ? register.c_image : DBNull.Value);
+                    Console.WriteLine($"Saving Image Path: {register.c_image}");
 
                     await cm.ExecuteNonQueryAsync();
                     return 1;
@@ -136,5 +126,6 @@ namespace Repositories.Implementations
                 }
             }
         }
+
     }
 }

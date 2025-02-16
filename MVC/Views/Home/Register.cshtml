@@ -187,6 +187,7 @@
             var country = $('#country').val();
             var state = $('#state').val();
             var district = $('#district').val();
+            
 
             // Check if fields are empty
             if (!username || !email || !password || !confirmPassword || !address || !mobile || !gender || !dob || !country || !state || !district) {
@@ -219,6 +220,8 @@
             formData.append("c_country", country);
             formData.append("c_state", state);
             formData.append("c_district", district);
+
+            
 
             var fileInput = $('#Image')[0].files[0];
             if (fileInput) {

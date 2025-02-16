@@ -59,13 +59,14 @@ namespace Repositories.Models
         [DataType(DataType.Date)]
         public DateTime c_dob { get; set; }
 
+
+       
         [StringLength(4000)]
         [Display(Name = "Profile Picture")]
-        public string? c_imagePath { get; set; }
-
-        [NotMapped]
+        public string? c_image { get; set; }
+         
         [Display(Name = "Profile Picture")]
-        public IFormFile? c_image { get; set; }
+        public IFormFile? ProfilePic { get; set; }
 
         [Required(ErrorMessage = "Please select your country")]
         [Display(Name = "Country")]
