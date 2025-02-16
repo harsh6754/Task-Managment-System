@@ -86,7 +86,7 @@
                                 confirmButtonText: 'OK'
                             }).then(() => {
                                 sessionStorage.setItem("user", JSON.stringify(response.userData));
-                                @* window.location.href = "/Home/Dashboard"; // Redirect after login *@
+                                window.location.href = "/Contact/Profile"; 
                             });
                         } else {
                             Swal.fire({
