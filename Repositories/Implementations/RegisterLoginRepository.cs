@@ -45,6 +45,10 @@ namespace Repositories.Implementations
                             UserData.c_password = reader["c_password"].ToString();
                             UserData.c_address = reader["c_address"].ToString();
                             UserData.c_mobile = reader["c_mobile"].ToString();
+                            UserData.c_country = reader["c_country"].ToString();
+                            UserData.c_state = reader["c_state"].ToString();
+                            UserData.c_district = reader["c_district"].ToString();  
+                            
                         }
                     }
                 }
@@ -63,347 +67,66 @@ namespace Repositories.Implementations
             return UserData;
         }
 
-   public async Task<int> Register(t_Register register)
-{
-    try
-    {
-        if (_conn.State != ConnectionState.Open)
+        public async Task<int> Register(t_Register register)
         {
-            _conn.Open();
-        }
-
-        // Check if the email already exists
-        using (NpgsqlCommand checkUsercmd = new NpgsqlCommand(
-            "SELECT COUNT(*) FROM t_user WHERE c_email = @c_email",
-            _conn
-        ))
-        {
-            checkUsercmd.Parameters.AddWithValue("@c_email", register.c_email);
-            int count = Convert.ToInt32(await checkUsercmd.ExecuteScalarAsync());
-            if (count > 0)
-            {
-                return 0; // User already exists
-            }
-        }
-
-        // Convert IFormFile to byte array for storage in `bytea`
-        byte[] imageBytes = null;
-        if (register.c_image != null)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await register.c_image.CopyToAsync(memoryStream);
-                imageBytes = memoryStream.ToArray();
-            }
-        }
-
-        // Insert user data
-        using (NpgsqlCommand cm = new NpgsqlCommand(
-            "INSERT INTO t_user (c_username, c_email, c_password, c_address, c_mobile, c_gender, c_dob, c_countryid, c_stateid, c_districtid, c_image) " +
-            "VALUES(@c_username, @c_email, @c_password, @c_address, @c_mobile, @c_gender, @c_dob, @c_countryid, @c_stateid, @c_districtid, @c_image)", _conn))
-        {
-            cm.Parameters.AddWithValue("@c_username", register.c_username);
-            cm.Parameters.AddWithValue("@c_email", register.c_email);
-            cm.Parameters.AddWithValue("@c_password", register.c_password);
-            cm.Parameters.AddWithValue("@c_address", register.c_address);
-            cm.Parameters.AddWithValue("@c_mobile", register.c_mobile);
-            cm.Parameters.AddWithValue("@c_gender", register.c_gender ?? (object)DBNull.Value);
-            cm.Parameters.AddWithValue("@c_dob", register.c_dob);
-            cm.Parameters.AddWithValue("@c_countryid", register.c_countryid ?? (object)DBNull.Value);
-            cm.Parameters.AddWithValue("@c_stateid", register.c_stateid ?? (object)DBNull.Value);
-            cm.Parameters.AddWithValue("@c_districtid", register.c_districtid ?? (object)DBNull.Value);
-            cm.Parameters.AddWithValue("@c_image", imageBytes ?? (object)DBNull.Value);
-
-            await cm.ExecuteNonQueryAsync();
-            return 1;
-        }
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine("Register Error: " + e.Message);
-        return -1;
-    }
-    finally
-    {
-        if (_conn.State == ConnectionState.Open)
-        {
-            _conn.Close();
-        }
-    }
-}
-
-
-
-        public async Task<List<t_Country>> GetAllCountries()
-        {
-            var countries = new List<t_Country>();
-            string qry = "SELECT c_countryid, c_countryname FROM t_country ORDER BY c_countryid";
             try
             {
                 if (_conn.State != ConnectionState.Open)
                 {
                     _conn.Open();
                 }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        countries.Add(
-                            new t_Country
-                            {
-                                c_countryid = Convert.ToInt32(reader["c_countryid"]),
-                                c_countryname = reader["c_countryname"].ToString()
-                            }
-                        );
-                    }
-                }
-                return countries;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GetAllCountries Error: " + e.Message);
-                return countries; // Return the list even if an error occurs
-            }
-            finally
-            {
-                if (_conn.State == ConnectionState.Open)
-                {
-                    _conn.Close();
-                }
-            }
-        }
 
-        public async Task<t_Country> GetCountryById(int id)
-        {
-            t_Country country = new t_Country();
-            string qry = "SELECT c_countryid, c_countryname FROM t_country WHERE c_countryid = @c_countryid";
-            try
-            {
-                if (_conn.State != ConnectionState.Open)
+                // Check if the email already exists
+                using (NpgsqlCommand checkUsercmd = new NpgsqlCommand(
+                    "SELECT COUNT(*) FROM t_user WHERE c_email = @c_email",
+                    _conn
+                ))
                 {
-                    _conn.Open();
-                }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                {
-                    cmd.Parameters.AddWithValue("@c_countryid", id);
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    checkUsercmd.Parameters.AddWithValue("@c_email", register.c_email);
+                    int count = Convert.ToInt32(await checkUsercmd.ExecuteScalarAsync());
+                    if (count > 0)
                     {
-                        if (reader.Read())
-                        {
-                            country.c_countryid = Convert.ToInt32(reader["c_countryid"]);
-                            country.c_countryname = reader["c_countryname"].ToString();
-                        }
+                        return 0; // User already exists
                     }
                 }
-                return country;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GetCountryById Error: " + e.Message);
-                return country; // Return the object even if an error occurs
-            }
-            finally
-            {
-                if (_conn.State == ConnectionState.Open)
-                {
-                    _conn.Close();
-                }
-            }
-        }
 
-        public async Task<List<t_State>> GetAllStates()
-        {
-            var states = new List<t_State>();
-            string qry = "SELECT c_stateid, c_statename FROM t_state ORDER BY c_stateid";
-            try
-            {
-                if (_conn.State != ConnectionState.Open)
+                // Convert IFormFile to byte array for storage in `bytea`
+                byte[] imageBytes = null;
+                if (register.c_image != null)
                 {
-                    _conn.Open();
-                }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                using (var reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
+                    using (var memoryStream = new MemoryStream())
                     {
-                        states.Add(
-                            new t_State
-                            {
-                                c_stateid = Convert.ToInt32(reader["c_stateid"]),
-                                c_statename = reader["c_statename"].ToString()
-                            }
-                        );
+                        await register.c_image.CopyToAsync(memoryStream);
+                        imageBytes = memoryStream.ToArray();
                     }
                 }
-                return states;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GetAllStates Error: " + e.Message);
-                return states; // Return the list even if an error occurs
-            }
-            finally
-            {
-                if (_conn.State == ConnectionState.Open)
-                {
-                    _conn.Close();
-                }
-            }
-        }
 
-        public async Task<List<t_State>> GetStatesByCountryId(int countryId)
-        {
-            var states = new List<t_State>();
-            string qry = "SELECT c_stateid, c_statename FROM t_state WHERE c_countryid = @c_countryid ORDER BY c_stateid";
-            try
-            {
-                if (_conn.State != ConnectionState.Open)
+                // Insert user data
+                using (NpgsqlCommand cm = new NpgsqlCommand(
+                    "INSERT INTO t_user (c_username, c_email, c_password,c_confirmPassword ,c_address, c_mobile, c_gender, c_dob, c_country, c_state, c_district, c_imagePath) " +
+                    "VALUES(@c_username, @c_email, @c_password,@c_confirmPassword, @c_address, @c_mobile, @c_gender, @c_dob, @c_country, @c_state, @c_district, @c_imagePath)", _conn))
                 {
-                    _conn.Open();
-                }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                {
-                    cmd.Parameters.AddWithValue("@c_countryid", countryId);
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            states.Add(
-                                new t_State
-                                {
-                                    c_stateid = Convert.ToInt32(reader["c_stateid"]),
-                                    c_statename = reader["c_statename"].ToString()
-                                }
-                            );
-                        }
-                    }
-                }
-                return states;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GetStatesByCountryId Error: " + e.Message);
-                return states; // Return the list even if an error occurs
-            }
-            finally
-            {
-                if (_conn.State == ConnectionState.Open)
-                {
-                    _conn.Close();
-                }
-            }
-        }
+                    cm.Parameters.AddWithValue("@c_username", register.c_username);
+                    cm.Parameters.AddWithValue("@c_email", register.c_email);
+                    cm.Parameters.AddWithValue("@c_password", register.c_password);
+                    cm.Parameters.AddWithValue("@c_confirmPassword", register.c_confirmpassword);
+                    cm.Parameters.AddWithValue("@c_address", register.c_address);
+                    cm.Parameters.AddWithValue("@c_mobile", register.c_mobile);
+                    cm.Parameters.AddWithValue("@c_gender", register.c_gender);
+                    cm.Parameters.AddWithValue("@c_dob", register.c_dob);
+                    cm.Parameters.AddWithValue("@c_country", register.c_country);
+                    cm.Parameters.AddWithValue("@c_state", register.c_state);
+                    cm.Parameters.AddWithValue("@c_district", register.c_district);
+                    cm.Parameters.AddWithValue("@c_imagePath", imageBytes ?? (object)DBNull.Value);
 
-        public async Task<t_State> GetStateById(int id)
-        {
-            t_State state = new t_State();
-            string qry = "SELECT c_stateid, c_statename FROM t_state WHERE c_stateid = @c_stateid";
-            try
-            {
-                if (_conn.State != ConnectionState.Open)
-                {
-                    _conn.Open();
+                    await cm.ExecuteNonQueryAsync();
+                    return 1;
                 }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                {
-                    cmd.Parameters.AddWithValue("@c_stateid", id);
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (reader.Read())
-                        {
-                            state.c_stateid = Convert.ToInt32(reader["c_stateid"]);
-                            state.c_statename = reader["c_statename"].ToString();
-                        }
-                    }
-                }
-                return state;
             }
             catch (Exception e)
             {
-                Console.WriteLine("GetStateById Error: " + e.Message);
-                return state; // Return the object even if an error occurs
-            }
-            finally
-            {
-                if (_conn.State == ConnectionState.Open)
-                {
-                    _conn.Close();
-                }
-            }
-        }
-
-        public async Task<List<t_District>> GetDistrictsByStateId(int stateId)
-        {
-            var districts = new List<t_District>();
-            string qry = "SELECT c_districtid, c_districtname FROM t_district WHERE c_stateid = @c_stateid ORDER BY c_districtid";
-            try
-            {
-                if (_conn.State != ConnectionState.Open)
-                {
-                    _conn.Open();
-                }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                {
-                    cmd.Parameters.AddWithValue("@c_stateid", stateId);
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            districts.Add(
-                                new t_District
-                                {
-                                    c_districtid = Convert.ToInt32(reader["c_districtid"]),
-                                    c_districtname = reader["c_districtname"].ToString()
-                                }
-                            );
-                        }
-                    }
-                }
-                return districts;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GetDistrictsByStateId Error: " + e.Message);
-                return districts; // Return the list even if an error occurs
-            }
-            finally
-            {
-                if (_conn.State == ConnectionState.Open)
-                {
-                    _conn.Close();
-                }
-            }
-        }
-
-        public async Task<t_District> GetDistrictById(int id)
-        {
-            t_District district = new t_District();
-            string qry = "SELECT c_districtid, c_districtname FROM t_district WHERE c_districtid = @c_districtid";
-            try
-            {
-                if (_conn.State != ConnectionState.Open)
-                {
-                    _conn.Open();
-                }
-                using (var cmd = new NpgsqlCommand(qry, _conn))
-                {
-                    cmd.Parameters.AddWithValue("@c_districtid", id);
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (reader.Read())
-                        {
-                            district.c_districtid = Convert.ToInt32(reader["c_districtid"]);
-                            district.c_districtname = reader["c_districtname"].ToString();
-                        }
-                    }
-                }
-                return district;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GetDistrictById Error: " + e.Message);
-                return district; // Return the object even if an error occurs
+                Console.WriteLine("Register Error: " + e.Message);
+                return -1;
             }
             finally
             {

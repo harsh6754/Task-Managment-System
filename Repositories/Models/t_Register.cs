@@ -1,13 +1,9 @@
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Http;
-using System.Text.RegularExpressions;
 
- 
 namespace Repositories.Models
 {
     public class t_Register
@@ -50,7 +46,7 @@ namespace Repositories.Models
         [StringLength(12, MinimumLength = 10, ErrorMessage = "Mobile number must be between 10 and 12 digits.")]
         [Required(ErrorMessage = "Enter your mobile number")]
         [Display(Name = "Mobile Number")]
-        [RegularExpression(@"^(\+\d{1,3}[- ]?)?\(?(\d{3})\)?[-. ]?(\d{3})[-. ]?(\d{4})$", ErrorMessage = "Invalid mobile number format.")] // Keep for basic format
+        [RegularExpression(@"^(\+\d{1,3}[- ]?)?\(?(\d{3})\)?[-. ]?(\d{3})[-. ]?(\d{4})$", ErrorMessage = "Invalid mobile number format.")]
         public string c_mobile { get; set; }
 
         [StringLength(50)]
@@ -63,22 +59,6 @@ namespace Repositories.Models
         [DataType(DataType.Date)]
         public DateTime c_dob { get; set; }
 
-        [StringLength(50)]
-        // [Required(ErrorMessage ="Choose country")]
-        [Display(Name = "Country")]
-        public string? c_country { get; set; }
-
-        [StringLength(50)]
-        // [Required(ErrorMessage ="Choose state")]
-        [Display(Name = "State")]
-        public string? c_state { get; set; }
-
-        [StringLength(50)]
-        // [Required(ErrorMessage ="Choose city")]
-        [Display(Name = "City")]
-        public string? c_district { get; set; }
-
-
         [StringLength(4000)]
         [Display(Name = "Profile Picture")]
         public string? c_imagePath { get; set; }
@@ -87,21 +67,16 @@ namespace Repositories.Models
         [Display(Name = "Profile Picture")]
         public IFormFile? c_image { get; set; }
 
+        [Required(ErrorMessage = "Please select your country")]
+        [Display(Name = "Country")]
+        public string? c_country { get; set; }
 
-        [Required]
-        public int ? c_countryid { get; set; }
+        [Required(ErrorMessage = "Please select your state")]
+        [Display(Name = "State")]
+        public string? c_state { get; set; }
 
-        public t_Country? CountryClass { get; set; }
-
-        [Column("c_stateid")]
-        public int ? c_stateid { get; set; }
-
-        [Column("c_districtid")]    
-        public int ? c_districtid { get; set; }
-
-        public string? c_state_name { get; set; }
-
-        public string? c_district_name { get; set; }
-  
+        [Required(ErrorMessage = "Please select your district")]
+        [Display(Name = "District")]
+        public string? c_district { get; set; }
     }
 }

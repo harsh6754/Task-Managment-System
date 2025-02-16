@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Repositories.Models
 {
+    [Table("t_country")]
     public class t_Country
     {
         [Key]
@@ -16,8 +17,6 @@ namespace Repositories.Models
         [Column("c_countryname")]
         [Required]
         [StringLength(50)]
-        public string c_countryname { get; set; }
-
-        
+        public string c_countryname { get; set; } 
     }
 }
